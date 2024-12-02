@@ -26,17 +26,16 @@
             string fileName = Path.GetFileName(new Uri(fileUrl).LocalPath);
 
             using (var scope = _serviceProvider.CreateScope())
-            {
-                var passportUpdateService = scope.ServiceProvider.GetRequiredService<PassportUpdateService>();     
+            {                
+                PassportUpdateService passportUpdateService = new PassportUpdateService("Unzip files\\PassportChanges.json");
+
                 var fileUpdateService = scope.ServiceProvider.GetRequiredService<FileUpdateService>();
 
                 destinationPath = await fileUpdateService.UpdateFileAsync(fileUrl, destinationPath);
-
+                
                 if (destinationPath.Contains(fileName))
                 {
-                    Console.WriteLine("Заносим в первый раз данные в бд...");
-
-                    passportUpdateService.WtiteFirstFileToDb(destinationPath);
+                    Console.WriteLine("Архив успешно скачан и распакован");                   
                 }
                 else
                 {
@@ -46,11 +45,7 @@
                     Console.WriteLine("Обрабатываем 2 новых файла...");
                     await comparer.CompareFilesAsync(destinationPath, newUnzipedFileName);
                 }
-
-                /*StreamFileComparer comparer = new StreamFileComparer(passportUpdateService);                
-
-                Console.WriteLine("Обрабатываем 2 новых файла...");
-                await comparer.CompareFilesAsync("Unzip files\\Outdated Data.csv", "Unzip files\\DataZ.csv");*/
+                
             }
         }
         public Task StopAsync(CancellationToken cancellationToken)

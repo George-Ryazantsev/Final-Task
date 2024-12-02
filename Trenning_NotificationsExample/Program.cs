@@ -15,7 +15,7 @@ builder.Services.AddDbContext<PassportContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 
 });
-builder.Services.AddScoped<PassportUpdateService>();
+//builder.Services.AddScoped<PassportUpdateService>();
 builder.Services.AddHostedService<PassportUpdateHostedService>();
 //builder.Services.AddScoped<FileComparer>();
 builder.Services.AddHttpClient<FileUpdateService>();
