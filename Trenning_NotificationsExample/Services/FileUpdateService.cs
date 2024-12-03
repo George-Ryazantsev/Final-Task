@@ -48,8 +48,7 @@ namespace Trenning_NotificationsExample.Services
                 }
                 else
                 {
-                    File.Move(GetFileName(), newFileNamePath);
-                    Console.WriteLine(" переименован 1 файл ");
+                    File.Move(GetFileName(), newFileNamePath);                   
 
                     return await UnZipFileAsync(fullDestinationPath);
                 }
@@ -91,7 +90,6 @@ namespace Trenning_NotificationsExample.Services
 
         private async Task<string> UnZipFileAsync(string fullDestinationPath)
         {           
-
             try
             {
                 Directory.CreateDirectory(unZipFilePath);
@@ -111,7 +109,12 @@ namespace Trenning_NotificationsExample.Services
                 Console.WriteLine($"Ошибка: {ex.Message}");
             }
 
-            return Directory.GetFiles(unZipFilePath)[1];
+            if (Directory.GetFiles(unZipFilePath).Length > 1)
+            {
+                return Directory.GetFiles(unZipFilePath)[1];
+            }
+
+            else return Directory.GetFiles(unZipFilePath)[0];                           
         }
         private string GetFileName()
         {           
