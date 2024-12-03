@@ -30,4 +30,4 @@ jobs:
       run: dotnet build --no-restore --configuration Release
  
     - name: Run tests with diagnostic log
-      run: dotnet test Trenning_NotificationsExample.Tests/Trenning_NotificationsExample.Tests.csproj --no-build --verbosity diag
+     run: dotnet test --test-adapter-path:bin/Debug/net8.0 --test-assembly:bin/Debug/net8.0/Trenning_NotificationsExample.Tests.dll
