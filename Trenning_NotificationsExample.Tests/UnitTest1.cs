@@ -6,7 +6,8 @@ namespace Trenning_NotificationsExample.Tests
         [Test]
         public void ExampleTest()
         {
-            Assert.AreEqual(1, 1); // Тест, который всегда проходит
+            
+            //Assert.E
         }
     }
 }
