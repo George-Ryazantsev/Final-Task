@@ -1,14 +1,10 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using System.Data;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Trenning_NotificationsExample.Models;
 
 namespace Trenning_NotificationsExample.Services
 {
     public class PassportUpdateService
-    {
-        private readonly string _connectionString;
+    {        
         private const int batchSize = 5000;
         private readonly string _filePath;       
 

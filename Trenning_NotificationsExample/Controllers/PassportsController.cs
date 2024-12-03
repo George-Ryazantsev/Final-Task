@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Trenning_NotificationsExample.Models;
 using Trenning_NotificationsExample.Services;
 

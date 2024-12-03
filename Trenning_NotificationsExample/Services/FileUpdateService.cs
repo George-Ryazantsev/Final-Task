@@ -57,7 +57,7 @@ namespace Trenning_NotificationsExample.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка при загрузке файла: {ex.Message}");
+                Console.WriteLine($"Ошибка при обновлении файла: {ex.Message}");
                 return string.Empty; 
             }
         }
