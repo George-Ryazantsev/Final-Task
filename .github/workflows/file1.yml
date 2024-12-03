@@ -21,13 +21,13 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.0' 
+        dotnet-version: '8.0'
 
     - name: Restore dependencies
       run: dotnet restore
 
     - name: Build solution
       run: dotnet build --no-restore --configuration Release
-
-   - name: Run tests
+ 
+    - name: Run tests
       run: dotnet test Trenning_NotificationsExample.Tests/Trenning_NotificationsExample.Tests.csproj --no-build --verbosity normal
