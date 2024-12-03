@@ -25,18 +25,9 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore
-
-    - name: Build solution
-      run: dotnet build --no-restore --configuration Release
       
-    - name: Debug
-      run: |
-        if [ ! -f "/home/runner/work/Final-Task/Final-Task/Trenning_NotificationsExample.Tests/bin/Debug/net8.0/Trenning_NotificationsExample.Tests.dll" ]; then
-          echo "Test DLL not found!"
-          exit 1
-        else
-          echo "Test DLL exists."
-        fi 
-            - name: Run tests 
+    - name: Build solution
+      run: dotnet build --configuration Debug
+          
     - name: Run tests
       run: dotnet test Trenning_NotificationsExample.Tests/Trenning_NotificationsExample.Tests.csproj --no-build --verbosity normal
