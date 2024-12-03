@@ -28,6 +28,9 @@ jobs:
 
     - name: Build solution
       run: dotnet build --no-restore --configuration Release
+      
+    - name: Debug: List files in test output directory
+      run: ls -la /home/runner/work/Final-Task/Final-Task/Trenning_NotificationsExample.Tests/bin/Debug/net8.0/
  
     - name: Run tests with diagnostic log
-     run: dotnet test --test-adapter-path:bin/Debug/net8.0 --test-assembly:bin/Debug/net8.0/Trenning_NotificationsExample.Tests.dll
+      run: dotnet test Trenning_NotificationsExample.Tests/Trenning_NotificationsExample.Tests.csproj --no-build --verbosity normal
