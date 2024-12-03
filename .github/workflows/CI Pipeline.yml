@@ -27,10 +27,13 @@ jobs:
       run: dotnet restore
 
     - name: Build solution
-      run: dotnet build --no-restore --configuration Release  
-      
-    - name: Debug: List files in test output directory
+      run: dotnet build --no-restore --configuration Debug  # Используем Debug, чтобы проверить все тесты
+    
+    - name: Debug: List all files in workspace
+      run: ls -R /home/runner/work/Final-Task/Final-Task/
+
+    - name: Debug: List test output directory
       run: ls -la /home/runner/work/Final-Task/Final-Task/Trenning_NotificationsExample.Tests/bin/Debug/net8.0/
 
     - name: Run tests
-      run: dotnet test Trenning_NotificationsExample.Tests/Trenning_NotificationsExample.Tests.csproj --no-build --verbosity normal  
+      run: dotnet test Trenning_NotificationsExample.Tests/Trenning_NotificationsExample.Tests.csproj --no-build --verbosity normal
