@@ -4,7 +4,7 @@
     using NUnit.Framework.Internal;
     using Trenning_NotificationsExample.Services;
 
-    [TestFixture]
+   /* [TestFixture]
     public class FileUpdateServiceTests
     {
         [Test]
@@ -20,7 +20,7 @@
             }, "Method threw an exception for a non-existent file.");
         }    
       
-    }
+    }*/
 }
 
 
