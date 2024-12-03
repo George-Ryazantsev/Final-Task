@@ -27,4 +27,8 @@
     <Folder Include="Stub classes\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Trenning_NotificationsExample\Trenning_NotificationsExample.csproj" />
+  </ItemGroup>
+
 </Project>
