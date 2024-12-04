@@ -9,8 +9,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSingleton<PassportUpdateService>();
 builder.Services.AddHostedService<PassportUpdateHostedService>();
 builder.Services.AddHttpClient<FileUpdateService>();
+
 
 
 var app = builder.Build();

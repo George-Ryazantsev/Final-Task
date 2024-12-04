@@ -4,15 +4,12 @@ using Trenning_NotificationsExample.Models;
 namespace Trenning_NotificationsExample.Services
 {
     public class PassportUpdateService
-    {        
-        private const int batchSize = 5000;
-        private readonly string _filePath;       
-
-        public PassportUpdateService(string filePath)
-        {
-            _filePath = filePath;
+    {                
+        private string _filePath;                
+        public string FilePath
+        {            
+            set => _filePath = value; 
         }
-
         public async Task<List<PassportChange>> LoadChangesAsync()
         {
             if (!File.Exists(_filePath))

@@ -8,8 +8,9 @@ namespace Trenning_NotificationsExample.Services
         private readonly HttpClient _httpClient;
         public FileUpdateService(HttpClient httpClient)
         {
-            _httpClient = httpClient;            
+            _httpClient = httpClient;
         }
+
         public async Task<string> UpdateFileAsync(string fileUrl, string destinationPath)
         {
             try
@@ -31,9 +32,10 @@ namespace Trenning_NotificationsExample.Services
 
                         Console.WriteLine($"Скачан обновленный zip архив {fileName}");
                     }
+                    else return GetFileName()[0];
                 }
-                else
-                {
+                else 
+                {                    
                     await DownloadFileAsync(fileUrl, destinationPath);
                     await UnZipFileAsync(fullDestinationPath);
 
@@ -42,13 +44,13 @@ namespace Trenning_NotificationsExample.Services
                 if (Directory.GetFiles(unZipFilePath).Length > 1)
                 {
                     File.Delete(newFileNamePath);
-                    File.Move(GetFileName(), newFileNamePath);
+                    File.Move(GetFileName()[0], newFileNamePath);
 
                     return await UnZipFileAsync(fullDestinationPath);
                 }
                 else
                 {
-                    File.Move(GetFileName(), newFileNamePath);                   
+                    File.Move(GetFileName()[0], newFileNamePath);                   
 
                     return await UnZipFileAsync(fullDestinationPath);
                 }
@@ -111,9 +113,9 @@ namespace Trenning_NotificationsExample.Services
             
             return Directory.GetFiles(unZipFilePath)[1];                                    
         }
-        private string GetFileName()
-        {           
-            return Directory.GetFiles(unZipFilePath)[0];
+        private string[] GetFileName()
+        {
+            return Directory.GetFiles(unZipFilePath);                        
         }
     }
 }
