@@ -44,7 +44,7 @@
                 Console.WriteLine("Обрабатываем 2 новых файла...");
                 await comparer.CompareFilesAsync(destinationPath, newUnzipedFileName);
             }
-            else //Console.WriteLine("Повторный запуск");
+           // else Console.WriteLine("Повторный запуск");
 
         }
         public Task StopAsync(CancellationToken cancellationToken)
