@@ -108,13 +108,8 @@ namespace Trenning_NotificationsExample.Services
             {
                 Console.WriteLine($"Ошибка: {ex.Message}");
             }
-
-            if (Directory.GetFiles(unZipFilePath).Length > 1)
-            {
-                return Directory.GetFiles(unZipFilePath)[1];
-            }
-
-            else return Directory.GetFiles(unZipFilePath)[0];                           
+            
+            return Directory.GetFiles(unZipFilePath)[1];                                    
         }
         private string GetFileName()
         {           
