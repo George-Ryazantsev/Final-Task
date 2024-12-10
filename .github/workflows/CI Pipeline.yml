@@ -1,0 +1,33 @@
+name: CI Pipeline
+
+on:
+  pull_request:  
+    branches:
+      - main    
+      - develop 
+  push:          
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0'
+
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build solution
+      run: dotnet build --configuration Debug
+          
+    - name: Run tests
+      run: dotnet test Trenning_NotificationsExample.Tests/Trenning_NotificationsExample.Tests.csproj --no-build --verbosity normal
