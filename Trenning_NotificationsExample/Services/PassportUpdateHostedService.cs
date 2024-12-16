@@ -43,7 +43,7 @@
                 UnzippedFile2Path = sortedFiles[0];
 
                 await comparer.LoadFileDataIntoDbAsync(UnzippedFile1Path);
-                await comparer.CompareFilesAsync(UnzippedFile1Path, UnzippedFile2Path);
+                //await comparer.CompareFilesAsync(UnzippedFile1Path, UnzippedFile2Path);
             }
             else
             {
@@ -52,12 +52,12 @@
                 StreamFileComparer comparer = new StreamFileComparer(_passportChangesService);
                 unZipFilesPath = Path.Combine(Directory.GetCurrentDirectory(), unZipFilesPath);
 
-               // await comparer.LoadFileDataIntoDbAsync(UnzippedFile1Path);
+                await comparer.LoadFileDataIntoDbAsync(UnzippedFile1Path);
                 //await comparer.LoadFileDataIntoDbAsync(unZipFilesPath+"DataZ.csv");
 
-                UnzippedFile2Path = await _fileUpdateService.UpdateFileAsync(UpdatedfileUrl, destinationPath);
+               // UnzippedFile2Path = await _fileUpdateService.UpdateFileAsync(UpdatedfileUrl, destinationPath);
 
-                await comparer.CompareFilesAsync(UnzippedFile1Path, UnzippedFile2Path);
+              //  await comparer.CompareFilesAsync(UnzippedFile1Path, UnzippedFile2Path);
             }
 
             //_fileUpdateService.DeleteUnnecessaryFile(UnzippedFile1Path);
