@@ -5,62 +5,63 @@
         private Timer _timer;
         PassportChangesService _passportChangesService;
         FileUpdateService _fileUpdateService;
-        public PassportUpdateHostedService(PassportChangesService passportChangesService, FileUpdateService fileUpdateService )
+        public PassportUpdateHostedService(PassportChangesService passportChangesService, FileUpdateService fileUpdateService)
         {
             _passportChangesService = passportChangesService;
             _fileUpdateService = fileUpdateService;
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(UpdatePassports, null, TimeSpan.Zero, TimeSpan.FromDays(1));
+            _timer = new Timer(UpdatePassportsAsync, null, TimeSpan.Zero, TimeSpan.FromDays(1));
 
             return Task.CompletedTask;
-        }        
-        private async void UpdatePassports(object state)
+        }
+        private async void UpdatePassportsAsync(object state)
         {
+            string UnzippedFile1Path, UnzippedFile2Path;
+
             string fileDownloadDir = "ArchivedFiles\\";
-            string unZipFilePath = "UnZipFiles\\";
+            string unZipFilesPath = "UnZipFiles\\";
+
             Directory.CreateDirectory(fileDownloadDir);
 
-              string destinationPath = Path.Combine(Directory.GetCurrentDirectory(), fileDownloadDir);
-              string fileUrl = " https://www.dropbox.com/scl/fi/el4itqnexz09jov2fjv06/DataZ.zip?rlkey=n6ivk5epo1e9ym8s7tzzgtatp&st=wzeiv953&dl=1";
+            string destinationPath = Path.Combine(Directory.GetCurrentDirectory(), fileDownloadDir);
 
-              string fileName = Path.GetFileName(new Uri(fileUrl).LocalPath);                      
+            string fileUrl = "https://www.dropbox.com/scl/fi/el4itqnexz09jov2fjv06/DataZ.zip?rlkey=n6ivk5epo1e9ym8s7tzzgtatp&st=nmfzrntq&dl=1";
+            //string fileUrl = "https://www.dropbox.com/scl/fi/el4itqnexz09jov2fjv06/DataZ.zip?rlkey=n6ivk5epo1e9ym8s7tzzgtatp&st=nmfzrntq&dl=1";
+             string UpdatedfileUrl = "https://www.dropbox.com/scl/fi/8hz7275w44lnivw7gl7b6/DataU.zip?rlkey=yx0wtbo2ph49z9bi64ifi0pyu&st=a0nisa5a&dl=1";
 
-          /*   destinationPath = await _fileUpdateService.UpdateFileAsync(fileUrl, destinationPath);
-              var lastModified = File.GetLastAccessTime(destinationPath+ fileName);
+            string fileName = Path.GetFileName(new Uri(fileUrl).LocalPath);
+            //string UpdatedFileName = Path.GetFileName(new Uri(UpdatedfileUrl).LocalPath);
 
-            if (destinationPath.Contains(fileName))
-            {
-                Console.WriteLine("Архив успешно скачан и распакован");
-            }
-            else if (lastModified.Date != DateTime.Today)
+            if (Directory.GetFiles(destinationPath).Length > 0)
             {
                 StreamFileComparer comparer = new StreamFileComparer(_passportChangesService);
-                string newUnzipedFileName = Path.Combine(destinationPath.Split('\\')[0], fileName.Split('.')[0] + ".csv");
+                var sortedFiles = Directory.GetFiles(unZipFilesPath).OrderBy(file => file.Length).ToArray();
 
-                Console.WriteLine("Обрабатываем 2 новых файла...");
-                await comparer.CompareFilesAsync(destinationPath, newUnzipedFileName);
+                UnzippedFile1Path = sortedFiles[1];
+                UnzippedFile2Path = sortedFiles[0];
+
+                await comparer.LoadFileDataIntoDbAsync(UnzippedFile1Path);
+                await comparer.CompareFilesAsync(UnzippedFile1Path, UnzippedFile2Path);
             }
-           else {
-                
-                Console.WriteLine("Тестовый запуск");
+            else
+            {
+                UnzippedFile1Path = await _fileUpdateService.UpdateFileAsync(fileUrl, destinationPath);
+
                 StreamFileComparer comparer = new StreamFileComparer(_passportChangesService);
-                string newUnzipedFileName = Path.Combine(destinationPath.Split('\\')[0], fileName.Split('.')[0] + ".csv");
+                unZipFilesPath = Path.Combine(Directory.GetCurrentDirectory(), unZipFilesPath);
 
-                Console.WriteLine("Обрабатываем 2 новых файла...");
-                await comparer.CompareFilesAsync(destinationPath, newUnzipedFileName); 
+               // await comparer.LoadFileDataIntoDbAsync(UnzippedFile1Path);
+                //await comparer.LoadFileDataIntoDbAsync(unZipFilesPath+"DataZ.csv");
 
-            }*/
+                UnzippedFile2Path = await _fileUpdateService.UpdateFileAsync(UpdatedfileUrl, destinationPath);
 
-           /* StreamFileComparer comparer = new StreamFileComparer(_passportChangesService);
-            destinationPath = Path.Combine(Directory.GetCurrentDirectory(), unZipFilePath);
+                await comparer.CompareFilesAsync(UnzippedFile1Path, UnzippedFile2Path);
+            }
 
-            string newUnzipedFileName = destinationPath + "DataZ.csv";
-            destinationPath += "Outdated Data.csv";            
+            //_fileUpdateService.DeleteUnnecessaryFile(UnzippedFile1Path);
 
-            Console.WriteLine("Обрабатываем 2 новых файла...");
-            await comparer.CompareFilesAsync(destinationPath, newUnzipedFileName);*/
         }
         public Task StopAsync(CancellationToken cancellationToken)
         {

@@ -18,10 +18,10 @@ namespace Trenning_NotificationsExample.Controllers
         }
 
         [HttpGet("{series}/{number}")]
-        public async Task<ActionResult<PassportChanges>> GetInactivePassport(string series, string number)
+        public async Task<ActionResult<InactivePassports>> GetInactivePassport(string series, string number)
         {
             var stopwatch = Stopwatch.StartNew();
-            var lastChange = await _passportsService.GetLastChangeAsync(series, number);
+            var lastChange = await _passportsService.GetInactivePassportAsync(series, number);
 
             if (lastChange != null) 
             {

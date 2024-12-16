@@ -6,6 +6,7 @@
 
         public string DatabaseName { get; set; } = null!;
 
-        public string PassportsCollectionName { get; set; } = null!;
+        public string PassportsChangesCollectionName { get; set; } = null!;
+        public string InactivePassportsCollectionName { get; set; } = null!;
     }
 }

@@ -1,10 +1,12 @@
-﻿using System.IO.Compression;
+﻿using SharpCompress.Common;
+using System.Diagnostics.Eventing.Reader;
+using System.IO.Compression;
 
 namespace Trenning_NotificationsExample.Services
 {
     public class FileUpdateService
     {
-        private string unZipFilePath = "UnZipFiles\\";                
+        private string unZipFilePath = "UnZipFiles\\";
         private readonly HttpClient _httpClient;
         public FileUpdateService(HttpClient httpClient)
         {
@@ -15,54 +17,36 @@ namespace Trenning_NotificationsExample.Services
         {
             try
             {
+
                 string fileName = Path.GetFileName(new Uri(fileUrl).LocalPath);
                 string fullDestinationPath = destinationPath + fileName;
 
                 string newFileName = "Outdated Data.csv";
                 string newFileNamePath = Path.Combine(unZipFilePath, newFileName);
 
+
                 if (Directory.GetFiles(destinationPath).Length > 0)
                 {
-                    var lastModified = File.GetLastWriteTime(fullDestinationPath);
-
-                    if (lastModified.Date != DateTime.Today)
-                    {
-                        File.Delete(fileName);
-                        await DownloadFileAsync(fileUrl, destinationPath);
-
-                        Console.WriteLine($"Скачан обновленный zip архив {fileName}");
-                    }
-                    else return GetFileName()[1];
-                }
-                else 
-                {                    
-                    await DownloadFileAsync(fileUrl, destinationPath);
-                    await UnZipFileAsync(fullDestinationPath);
-
-                    return fileName;
-                }
-                if (Directory.GetFiles(unZipFilePath).Length > 1)
-                {
-                    File.Delete(newFileNamePath);
                     File.Move(GetFileName()[0], newFileNamePath);
 
-                    return await UnZipFileAsync(fullDestinationPath);
+                    await DownloadFileAsync(fileUrl, destinationPath);
+                    return (await UnZipFileAsync(fullDestinationPath))[1];
                 }
+
                 else
                 {
-                    File.Move(GetFileName()[0], newFileNamePath);                   
-
-                    return await UnZipFileAsync(fullDestinationPath);
+                    await DownloadFileAsync(fileUrl, destinationPath);
+                    return (await UnZipFileAsync(fullDestinationPath))[0];
                 }
-
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Ошибка при обновлении файла: {ex.Message}");
-                return string.Empty; 
+                return string.Empty;
             }
         }
-      
+
+
         private async Task DownloadFileAsync(string fileUrl, string destinationPath)
         {
             string fullDestinationPath = destinationPath;
@@ -90,8 +74,8 @@ namespace Trenning_NotificationsExample.Services
             }
         }
 
-        private async Task<string> UnZipFileAsync(string fullDestinationPath)
-        {           
+        private async Task<string[]> UnZipFileAsync(string fullDestinationPath)
+        {
             try
             {
                 Directory.CreateDirectory(unZipFilePath);
@@ -104,18 +88,23 @@ namespace Trenning_NotificationsExample.Services
 
                         entry.ExtractToFile(destinationPath, overwrite: true);
                     }
-                }
+                }                
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Ошибка: {ex.Message}");
             }
-            
-            return Directory.GetFiles(unZipFilePath)[1];                                    
+
+            return Directory.GetFiles(unZipFilePath);
         }
         private string[] GetFileName()
         {
-            return Directory.GetFiles(unZipFilePath);                        
+            return Directory.GetFiles(unZipFilePath).OrderBy(file => file.Length).ToArray();            
+        }
+
+        public void DeleteUnnecessaryFile(string filePath)
+        {
+            File.Delete(filePath);
         }
     }
 }

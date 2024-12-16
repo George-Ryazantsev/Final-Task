@@ -21,6 +21,14 @@ builder.Services.AddSingleton<PassportChangesService>();
 builder.Services.AddHostedService<PassportUpdateHostedService>();
 builder.Services.AddHttpClient<FileUpdateService>();
 
+/*builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5000); // HTTP
+    options.ListenAnyIP(5001, listenOptions =>
+    {
+        listenOptions.UseHttps(); // Убедитесь, что это включено
+    });
+});*/
 
 var app = builder.Build();
 
@@ -31,10 +39,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+/*app.Urls.Add("http://0.0.0.0:5000");
+app.Urls.Add("https://0.0.0.0:5001");*/
 
 app.Run();

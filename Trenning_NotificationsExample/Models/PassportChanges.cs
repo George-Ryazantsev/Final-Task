@@ -4,16 +4,17 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace Trenning_NotificationsExample.Models
 {
     public class PassportChanges
-    {        
+    {
+        // Устанавливаем составное поле Series_Number как первичный ключ
         [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public ObjectId Id { get; set; }
+        [BsonRepresentation(BsonType.String)] // Используем строковое представление
+        public string Id { get; set; }
 
-        [BsonElement("Series")]
-        public string Series { get; set; }
+        [BsonIgnore] // Убираем эти поля из сериализации, чтобы хранить только Id
+        public string Series => Id.Split('_')[0]; // Автоматически извлекаем Series из Id
 
-        [BsonElement("Number")]
-        public string Number { get; set; }
+        [BsonIgnore]
+        public string Number => Id.Split('_')[1]; // Автоматически извлекаем Number из Id
 
         [BsonElement("ChangeType")]
         public string ChangeType { get; set; }

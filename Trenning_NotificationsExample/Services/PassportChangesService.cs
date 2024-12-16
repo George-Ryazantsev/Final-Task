@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using System.Buffers;
 using Trenning_NotificationsExample.Models;
 using Trenning_NotificationsExample.MongoDB;
 
@@ -8,6 +9,7 @@ namespace Trenning_NotificationsExample.Services
     public class PassportChangesService
     {
         private readonly IMongoCollection<PassportChanges> _passportChangesCollection;
+        private readonly IMongoCollection<InactivePassports> _inactivePassportCollection;
 
         public PassportChangesService(
             IOptions<PassportsDatabaseSettings> passportsDatabaseSettings)
@@ -18,57 +20,27 @@ namespace Trenning_NotificationsExample.Services
             var mongoDatabase = mongoClient.GetDatabase(
                 passportsDatabaseSettings.Value.DatabaseName);
 
+            _inactivePassportCollection = mongoDatabase.GetCollection<InactivePassports>(
+                passportsDatabaseSettings.Value.InactivePassportsCollectionName);
+
             _passportChangesCollection = mongoDatabase.GetCollection<PassportChanges>(
-                passportsDatabaseSettings.Value.PassportsCollectionName);
+                passportsDatabaseSettings.Value.PassportsChangesCollectionName);
         }
         public async Task<IEnumerable<PassportChanges>> GetAllChangesAsync()
         {
             return await _passportChangesCollection.Find(_ => true).ToListAsync();
         }
 
-        public async Task<PassportChanges> GetLastChangeAsync(string series, string number)
-        {
-         
-            /*var client = new MongoClient("mongodb://localhost:27017");
-            var database = client.GetDatabase("Passports");
-            var collection = database.GetCollection<PassportChanges>("PassportChanges");
-            var count = await collection.CountDocumentsAsync(FilterDefinition<PassportChanges>.Empty);
-            Console.WriteLine($"Documents in collection: {count}");     
+        public async Task<InactivePassports> GetInactivePassportAsync(string series, string number)
+        {            
+            var id = $"{series}_{number}";
 
-           var newPassportChange = new PassportChanges
-            {
-                Series = "1234",
-                Number = "567890",
-                ChangeType = "Added",
-                ChangeDate = DateTime.UtcNow
-            };
-            try
-            {
-                await _passportChangesCollection.InsertOneAsync(newPassportChange);
-                //await collection.InsertOneAsync(newPassportChange);
-            }
-            catch (Exception ex) { Console.WriteLine("ddddd errror"); }
-            Console.WriteLine("Document added successfully");
-
-
-
-
-            series = "6666";
-            number = "666666";
-            var result = await _passportChangesCollection
-                .Find(c => c.Series == series && c.Number == number)
-                .FirstOrDefaultAsync();
-
-            return result;*/
-
-            return await _passportChangesCollection
-                 .Find(c => c.Series == series && c.Number == number)
-                 .SortByDescending(c => c.ChangeDate)
-                 .FirstOrDefaultAsync();
+            return await _inactivePassportCollection.Find(x => x.Id == id).FirstOrDefaultAsync();                  
         }
 
         public async Task<IEnumerable<PassportChanges>> GetChangesByDateAsync(DateTime date)
         {
+
             return await _passportChangesCollection
                 .Find(c => c.ChangeDate.Date == date.Date)
                 .ToListAsync();
@@ -82,15 +54,49 @@ namespace Trenning_NotificationsExample.Services
                 .ToListAsync();
         }
 
-        public async Task WriteFileToDb(PassportChanges passportChange)
+        public async Task WriteFileToDb(List<InactivePassports> batch, int batchSize)
         {            
-            await _passportChangesCollection.InsertOneAsync(passportChange);
+        
+            batchSize = batchSize / 8;           
+            var batches = batch
+                .Select((doc, index) => new { doc, index })
+                .GroupBy(x => x.index / batchSize)
+                .Select(g => g.Select(x => x.doc).ToList())
+                .ToList();
 
-            //Console.WriteLine("Добавлен новый документ:");
-            Console.WriteLine($"Series: {passportChange.Series}, Number: {passportChange.Number}");
+
+            var tasks = batches
+           .Select(batch => Task.Run(async () =>
+           {
+               await _inactivePassportCollection.InsertManyAsync(batch, new InsertManyOptions { IsOrdered = false });               
+           }))
+             .ToArray();
+            
+            await Task.WhenAll(tasks);            
+            
         }
-       
+        public async Task WriteFileToDb(List<PassportChanges> batch, int batchSize)
+        {
+            batchSize = batchSize / 8;            
+            var batches = batch
+                .Select((doc, index) => new { doc, index })
+                .GroupBy(x => x.index / batchSize)
+                .Select(g => g.Select(x => x.doc).ToList())
+                .ToList();
+
+
+            var tasks = batches
+           .Select(batch => Task.Run(async () =>
+           {
+               await _passportChangesCollection.InsertManyAsync(batch, new InsertManyOptions { IsOrdered = false });
+           }))
+             .ToArray();
+
+            await Task.WhenAll(tasks);
+        }
+
     }
 
-    
+
+
 }

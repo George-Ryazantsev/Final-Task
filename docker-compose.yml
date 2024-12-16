@@ -1,19 +1,31 @@
- 
 services:
-  webapi:
+  trenning_notificationsexample:
+    image: ${DOCKER_REGISTRY-}trenningnotificationsexample
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Trenning_NotificationsExample\Dockerfile
     ports:
-      - "5000:5000" # HTTP          
+      - "5000:5000"
+      - "5001:5001"
+    environment:            
+      - ASPNETCORE_ENVIRONMENT=Development         
     depends_on:
       - mongodb
   mongodb:
-    image: mongo
-    container_name: mongo
+    container_name: mongodb
+    image: mongo:8.0.4
     ports:
-      - "27017:27017"
+      - 27017:27017    
     volumes:
-      - mongo_data:/data/db
+      - mongodb:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: Passports
+
 volumes:
-  mongo_data:
+  mongodb:
+  
+networks:
+  default:
+    external: true
